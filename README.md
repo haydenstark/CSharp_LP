@@ -46,7 +46,53 @@ Within the AdminSettings.json file, our team wanted to keep track of every model
 The Donation Index Page was accessible only by the admin and displayed all recent donations within a table. Though this story was rather simple, it was one of my favorite avenues of programming - styling and CSS. The tough part with this story was avoiding overriding any Bootstrap classes or classes created by other students. My work around was creating a lengthy id; "#donation-index-table" and targetting the needed html elements ie, #donation-index-table tr, th, td and so on.
 
 ## Rental Create Page
-This was my last and maybe most challenging story. The theatre company wanted to be able to keep track of items/studios that were being rented out. When I started this story, we had a base Rental class and an Equipment Rental and a Room Rental which both inherited the base properties from Rental. All three were saved into the same table in the database, and within the table they were flagged as Rental, Equipment, or Room based on which model type they were being saved as. The story asked to be able to save any one of the three types all from the same form. My first idea was attempting to overload the POST method, dependent on which parameters were being passed into the method, but that unfortunately resulted in an ambiguous error. I also attempted adjusting the binding prefixes, but was having issues with the view model the page was using to display the different inherited classes. Due to time and considering I was already using jQuery to disable form inputs depending on which type of rental was being saved, I ultimately added two more methods and had jQuery adjust the POST url to target the corresponding controller method. If I had more time within the sprint, I would absolutely go back in to refactor and consolidate the multiple methods into just one.
+This was my last and maybe most challenging story. The theatre company wanted to be able to keep track of items/studios that were being rented out. When I started this story, we had a base Rental class and an Equipment Rental and a Room Rental which both inherited the base properties from Rental. All three were saved into the same table in the database, and within the table they were flagged as Rental, Equipment, or Room based on which model type they were being saved as. The story asked to be able to save any one of the three types all from the same form. My first idea was attempting to overload the POST method, dependent on which parameters were being passed into the method, but that unfortunately resulted in an ambiguous error. I also attempted adjusting the binding prefixes, but was having issues with the view model the page was using to display the different inherited classes. Due to time and considering I was already using jQuery to disable form inputs depending on which type of rental was being saved, I ultimately added two more methods and had jQuery adjust the POST url to target the corresponding controller method. If I had more time within the sprint, I would absolutely go back in to refactor and consolidate the multiple methods into just one.  
+Drop down that switched the type of rental:
+```
+<div class="form-group w-25">
+    <select id="rental-type-select" class="form-select">
+        <option selected value="disable">Choose the rental type...</option>
+        <option value="equipment-select">Equipment Rental</option>
+        <option value="room-select">Room Rental</option>
+    </select>
+</div>
+```
+jQuery behind the drop down:
+```
+<script>
+    $(document).ready(disableAll());
+    $("#rental-type-select").on("change", function () {         // fires everytime the 'rental type' drop down changes
+        var selected = $(this).find(":selected").val();
+        if (selected == "disable") {
+            disableAll();
+        }
+        else if (selected == "equipment-select") {
+            enableEquipment();
+        }
+        else if (selected == "room-select") {
+            enableRoom();
+        }
+    });
+
+    function disableAll() {             // will disable RentalEquipment and RentalRoom fields and strip any values in those fields
+        $("#RentalEquipment *").prop("disabled", true);
+        $("#RentalEquipment *").prop("checked", false);
+        $("#RentalRoom *").prop("disabled", true);
+        $("#rental-create-form").attr("action", "/Rental/Create");              // form will be sent to the default 'Create' method
+    }
+    function enableEquipment() {        // RentalEquipment fields enabled, RentalRoom fields disabled and stripped of values
+        $("#RentalEquipment *").prop("disabled", false);
+        $("#RentalRoom *").prop("disabled", true);
+        $("#rental-create-form").attr("action", "/Rental/CreateEquipment");     // form will be sent to 'CreateEquipment' method
+    }
+    function enableRoom() {             // RentalRoom fields enabled, RentalEquipment fields disabled and stripped of values
+        $("#RentalEquipment *").prop("disabled", true);
+        $("#RentalEquipment *").prop("checked", false);
+        $("#RentalRoom *").prop("disabled", false);
+        $("#rental-create-form").attr("action", "/Rental/CreateRoom");          // form will be sent to 'CreateRoom' method
+    }
+</script>
+```
 
 ## Skills Learned
 * Better understanding of C#
